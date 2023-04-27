@@ -13,7 +13,7 @@ docker compose run --service-ports icarust
 ```
 
 
-In order to run with docker, `docker engine > 3.20` and `docker compose` must be installed.
+In order to run with docker, `docker engine > 3.20` and `docker compose` must be installed. Respective instructions for [Docker](https://docs.docker.com/engine/install/ubuntu/#set-up-the-repository), and [docker compose](https://docs.docker.com/compose/install/linux/#install-using-the-repository). The compose instructions are for linux alone, I believe that you need to install docker desktop for MacOS in order to have `compose`.
 
 Whilst this is possible on Windows, linux and MacOS, I only have access to one of these OSs, and the volume bindings in the `docker-compose.yml` are linux specific. Pull requests welcome 👀. See below in the volumes explanation for how to change this.
 
