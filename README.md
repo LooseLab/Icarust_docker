@@ -114,7 +114,9 @@ volumes:
 
 ```
 
-# Permission Shenanigans
+## Troubleshooting
+
+### Permission Shenanigans
 By default the container runs with a User ID of 1000. If you are the primary user of this computer, this is likely to be you! This will not leave you with any problems. *However* If you are not the primary user, or you are running on a server with other user accounts on, you will not be able to wrtie out signal. In order to fix this, you can set the `--user` argument on the `docker compose run` command. 
 
 
