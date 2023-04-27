@@ -1,18 +1,28 @@
 ## Running with Docker
 
-    Or, I see you have common sense
+    Or, I see you have some common sense
 
 ### NB - MinKNOW _must_ still be installed on the system that the docker container is run on!
 
+### Quick start
+
+```nu
+git clone https://github.com/LooseLab/Icarust_docker.git
+cd Icarust_docker
+docker compose run --service-ports icarust
+```
+
+
 In order to run with docker, `docker engine > 3.20` and `docker compose` must be installed.
 
-Whilst this is possible on Windows, linux and MacOS, I only have access to one of these OSs, and the volume bindings in the `docker-compose.yml` are linux specific. Pull requests welcome 👀
+Whilst this is possible on Windows, linux and MacOS, I only have access to one of these OSs, and the volume bindings in the `docker-compose.yml` are linux specific. Pull requests welcome 👀. See below in the volumes explanation for how to change this.
 
 To run with simple defaults, enter the directory containing your docker-compose file and simply:
 
 ```bash
-docker compose run icarust
+docker compose run --service-ports icarust
 ```
+*NB.* The flag `--service-ports` opens up the ports on the docker container, so that the minKNOW API can connect. Otherwise, `docker compose run` ignores opening ports on the container.
 
 Let's break down what happens here. The contents of [docker-compose.yml](docker-compose.yml) are as follows - 
 
@@ -31,9 +41,13 @@ services:
     volumes:
       - ./configs:/configs
       - /opt/ont/minknow/conf/rpc-certs:/opt/ont/minknow/conf/rpc-certs
-      - ../squiggle_arrs:/squiggle_arrs
+      - ./squiggle_arrs:/squiggle_arrs
+      - ./output:/tmp
 
 ```
+
+So when we call docker compose run, the image listed at `adoni5/icarust:latest` is pulled, the required ports are exposed, and the required volumes are mounted. 
+
 Ignoring the `build` section as out of context, (read more [here](https://docs.docker.com/compose/compose-file/build/) if you wish to understand), this file effectively defines the icarust service. 
 
 ```yaml
@@ -41,7 +55,6 @@ icarust:
   image: adoni5/icarust:latest
   init: true
 ```
-
 
 If the docker image for icarust is not found locally, one is pulled from hub.docker.com, from the adoni5/icarust repository. `init:true` means that icarust is run as the top level process, or `PID:1`. This allows it to respond to signals that are sent to the running container, such as `KeyboardInterrupt` to stop the process.
 
@@ -58,17 +71,25 @@ volumes:
   - ./configs:/configs
   - /opt/ont/minknow/conf/rpc-certs:/opt/ont/minknow/conf/rpc-certs
   - ../squiggle_arrs:/squiggle_arrs
+  - ./output:/tmp
 ```
 
 This final section binds the listed directories on the left of the : of each line to the directories inside the container given on the right. This was the reasoning behind using compose to manage this container as it made the execution command much tidier. 
 
     - /configs contains the Simulation profile tomls and the config.ini file to pass parameters to the sequencer.
     - /opt/ont/minknow/conf/rpc-certs. This is the one that is hardcoded to linux at the moment. The problem here is that MinKNOW expects TLS secured GRPC connections, so we need to provide this, so MinKNOW must be installe don your system! Or the rpc-certs bundled with MinKNOw must be found at this location.
-    - /sqiggle_arrs. Pregenerated squiggle must be placed here. 
+    - /sqiggle_arrs. Pregenerated squiggle must be placed here.
+    - ./output:/tmp binds the host directory `output` to the `/tmp` directory in the container. This is where the squiggle is written to by default, so it is then available to the host system for analysis.
 
-So when we call docker compose run, the image listed at `adoni5/icarust:latest` is pulled, the required ports are exposed, and the required volumes are mounted. 
+For a MacOS machine, it would suffice to change the certificate volume on the left of the : to the location the certficates are found. For example:
 
-# Pass different arguments to Icarust
+```bash
+  - /Path/To/MacOS/MinKNOW/Certificates:/opt/ont/minknow/conf/rpc-certs
+```
+
+If the path is left the same as the right hand side of the colon in the `config.ini`, then you should still be golden!
+
+## Pass different arguments to Icarust
 
 The default arguments are defined in the main Icarust repo, in `docker/Dockerfile`. They are set in the Dockerfile, and are
 
@@ -82,3 +103,13 @@ In order to change the Simulation Profile we are running, simply provide alterna
 docker compose run icarust -vv -s /configs/<your_config_here>.toml
 ```
 
+If you wish to change the number of channels or where the certificate path is located, these values can be edited in `configs/config.ini`. If the rpc certificates are changed, these will have to be changed to the respective values in the `docker-compose.yml`. For example if the certificates were changed to `/opt/ont/WinKNOW/what_certs`, the `docker-compose.yml` would become
+
+```yaml
+volumes:
+  - ./configs:/configs
+  - /opt/ont/WinKNOW/what_certs:/opt/ont/WinKNOW/what_certs
+  - ../squiggle_arrs:/squiggle_arrs
+  - ./output:/tmp
+
+```
