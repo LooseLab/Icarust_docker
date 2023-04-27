@@ -113,3 +113,24 @@ volumes:
   - ./output:/tmp
 
 ```
+
+# Permission Shenanigans
+By default the container runs with a User ID of 1000. If you are the primary user of this computer, this is likely to be you! This will not leave you with any problems. *However* If you are not the primary user, or you are running on a server with other user accounts on, you will not be able to wrtie out signal. In order to fix this, you can set the `--user` argument on the `docker compose run` command. 
+
+
+| :zap:       Disclaimer, I have no idea how this works on windows!   |
+|---------------------------------------------------------------------|
+
+Find out who you are by running the `id` command on the command line.
+Example output for ubuntu 20:
+```bash
+uid=997(adoni5) gid=1000(adoni5)```
+```
+
+So I can see here my user id is 997.
+In order to run with permissions to interact with the output FAST5 files, you can run the starting command as:
+
+```bash
+docker compose run --user 997 --service-ports icarust [optional arguments to Icarust]
+```
+
