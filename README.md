@@ -1,7 +1,7 @@
 ## Running with Docker
 
     Or, I see you have some common sense
-
+Source code here https://github.com/Looselab/Icarust/!
 ### NB - MinKNOW _must_ still be installed on the system that the docker container is run on!
 
 ### Quick start
@@ -14,6 +14,9 @@ docker compose run --service-ports icarust
 
 
 In order to run with docker, `docker engine > 3.20` and `docker compose` must be installed. Respective instructions for [Docker](https://docs.docker.com/engine/install/ubuntu/#set-up-the-repository), and [docker compose](https://docs.docker.com/compose/install/linux/#install-using-the-repository). The compose instructions are for linux alone, I believe that you need to install docker desktop for MacOS in order to have `compose`.
+
+| :exclamation:  Due to MacOS using virtualisation, file writing is very slow. It may be better for MacOS users to run natively. See [here](https://github.com/Looselab/Icarust/#quick-start-docker).   |
+|-----------------------------------------|
 
 Whilst this is possible on Windows, linux and MacOS, I only have access to one of these OSs, and the volume bindings in the `docker-compose.yml` are linux specific. Pull requests welcome 👀. See below in the volumes explanation for how to change this.
 
@@ -77,7 +80,7 @@ volumes:
 This final section binds the listed directories on the left of the : of each line to the directories inside the container given on the right. This was the reasoning behind using compose to manage this container as it made the execution command much tidier. 
 
     - /configs contains the Simulation profile tomls and the config.ini file to pass parameters to the sequencer.
-    - /opt/ont/minknow/conf/rpc-certs. This is the one that is hardcoded to linux at the moment. The problem here is that MinKNOW expects TLS secured GRPC connections, so we need to provide this, so MinKNOW must be installe don your system! Or the rpc-certs bundled with MinKNOw must be found at this location.
+    - /opt/ont/minknow/conf/rpc-certs. This is the one that is hardcoded to linux at the moment. The problem here is that MinKNOW expects TLS secured GRPC connections, so we need to provide this, so MinKNOW must be installed on your system! Or the rpc-certs bundled with MinKNOw must be found at this location.
     - /sqiggle_arrs. Pregenerated squiggle must be placed here.
     - ./output:/tmp binds the host directory `output` to the `/tmp` directory in the container. This is where the squiggle is written to by default, so it is then available to the host system for analysis.
 
