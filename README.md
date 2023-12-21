@@ -1,8 +1,7 @@
 ## Running with Docker
 
-    Or, I see you have some common sense
+    Or, I see you have some sense
 Source code here https://github.com/Looselab/Icarust/!
-### NB - MinKNOW _must_ still be installed on the system that the docker container is run on!
 
 ### Quick start
 
@@ -43,7 +42,6 @@ services:
       - "10001:10001"
     volumes:
       - ./configs:/configs
-      - /opt/ont/minknow/conf/rpc-certs:/opt/ont/minknow/conf/rpc-certs
       - ./squiggle_arrs:/squiggle_arrs
       - ./output:/tmp
 
@@ -72,7 +70,6 @@ This exposes the ports 10000, and 10001 from inside the container to the host ma
 ```yaml
 volumes:
   - ./configs:/configs
-  - /opt/ont/minknow/conf/rpc-certs:/opt/ont/minknow/conf/rpc-certs
   - ../squiggle_arrs:/squiggle_arrs
   - ./output:/tmp
 ```
@@ -80,17 +77,19 @@ volumes:
 This final section binds the listed directories on the left of the : of each line to the directories inside the container given on the right. This was the reasoning behind using compose to manage this container as it made the execution command much tidier. 
 
     - /configs contains the Simulation profile tomls and the config.ini file to pass parameters to the sequencer.
-    - /opt/ont/minknow/conf/rpc-certs. This is the one that is hardcoded to linux at the moment. The problem here is that MinKNOW expects TLS secured GRPC connections, so we need to provide this, so MinKNOW must be installed on your system! Or the rpc-certs bundled with MinKNOw must be found at this location.
     - /sqiggle_arrs. Pregenerated squiggle must be placed here.
     - ./output:/tmp binds the host directory `output` to the `/tmp` directory in the container. This is where the squiggle is written to by default, so it is then available to the host system for analysis.
 
-For a MacOS machine, it would suffice to change the certificate volume on the left of the : to the location the certficates are found. For example:
+## TLS Certs
+The TLS certs are bundled in the image - any config.ini that you pass should set the `TLS` section as follows - 
 
-```bash
-  - /Path/To/MacOS/MinKNOW/Certificates:/opt/ont/minknow/conf/rpc-certs
+```ini
+[TLS]
+cert-dir = /static/tls_certs/
 ```
 
-If the path is left the same as the right hand side of the colon in the `config.ini`, then you should still be golden!
+## Profile Tomls
+For actual simulation settings, see the [Icarust Readme.](https://github.com/LooseLab/Icarust#changing-configured-settings)
 
 ## Pass different arguments to Icarust
 
